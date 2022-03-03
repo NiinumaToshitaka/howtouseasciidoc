@@ -1,0 +1,192 @@
+= ubuntuでのasciidocインストール手順
+// 以下の2行はアトリビュートで指定するかasciidoctor-pdf実行時に引数で渡さないと、
+// 日本語の文字が豆腐になる。
+:pdf-theme: default-with-fallback-font
+:scripts: cjk
+// 画像を格納するルートディレクトリ。
+// このアトリビュートを設定した場合、たとえば"images:hoge.png[]"のように記載したとき、
+// "<このファイルが存在するディレクトリ>/.asciidoctor/hoge.png"が挿入される。
+:imagesdir: .asciidoctor
+// asciidoctorが図の画像ファイルを出力するときの保存先ディレクトリ
+:imagesoutdir: .asciidoctor
+:outdir: .asciidoctor
+// 章番号を振る
+:sectnums:
+// 目次を入れる
+:toc:
+// 目次のタイトルを設定する。指定しない場合は"Table of Contents"になる。
+:toc-title: 目次
+// アイコンをレンダリングするのに必要
+:icons: font
+// ソースコードのハイライトに使用するツールを指定
+:source-highlighter: rouge
+
+== 環境
+
+* OS: Ubuntu 20.04 LTS
+
+== 参考文献
+
+* link:https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start[AsciiDoc文書作成入門 [AFFRIT Portal\]]
+* link:pass:[https://qiita.com/_Shallot_/items/0b5076c98155cb6f38a0][asciidoctor-pdfで日本語を含むSVG画像を扱う - Qiita]
+** URLの中に``_``で囲まれた部分があるとイタリック演算子として扱われてしまい、リンクが機能しなくなる。これを防ぐには、``\pass:[URL]``のようにすることで記号がエスケープされる。
+
+== 環境構築
+
+=== rubyインストール
+
+asciidoctor（後述）はubuntuのパッケージ管理システムにも登録されているが、RubyGem (gem)パッケージとして配布されているものを使用するのが一般的なようなので、rubyをインストールする。
+
+ここでは簡単のためにパッケージ管理システムを使用してインストールする。
+ただしlink:https://www.ruby-lang.org/ja/documentation/installation/#package-management-systems[Rubyのインストール]によると、パッケージ管理システムに登録されているバージョンは最新ではないので推奨されていない。
+
+``sudo apt install ruby``
+
+=== asciidoctorインストール
+
+asciidocの処理系としてasciidoctorを使用する。
+というか他の処理系あるの？
+
+`sudo gem install asciidoctor asciidoctor-pdf asciidoctor-diagram`
+
+* `asciidoctor`: HTMLに変換するのに使う
+* `asciidoctor-pdf`: PDFに変換するのに使う
+* `asciidoctor-diagram`: PlantUMLなどの図をレンダリングするために使うasciidoc拡張
+
+=== vscodeインストール
+
+Visual Studio Code(vscode)の拡張機能を使うと、asciidocテキストを編集したりプレビューしたりするのが簡単にできるので、ここではasciidocテキストのエディタとしてvscodeを使う。
+
+Ubuntu Softwareからvscodeをインストールすると日本語を入力できないので、link:https://code.visualstudio.com[Visual Studio Code - Code Editing. Redefined]からdebパッケージをダウンロードしてインストールする。
+
+=== vscodeのasciidoc拡張機能をインストール
+
+拡張機能タブで``asciidoctor.asciidoctor-vscode``を検索してインストールする。
+ファイルの拡張子を``.adoc``にして保存すると、asciidocテキストのハイライトが有効になる。
+
+vscodeの設定画面を開き、以下のとおり設定する。
+
+* Asciidoc: Asciidoctor_command: `asciidoctor -r asciidoctor-diagram -a outdir=.asciidoctor -a imagesdir=.asciidoctor -a imagesoutdir=.asciidoctor`
+* Asciidoc: Use_asciidoctor_js: チェックを外す。JavaScript版のasciidoctorを使わず、PCにインストールしたasciidoctor(Ruby版)を使う。
+* Asciidoc: Use_asciidoctorpdf: チェックを入れる。PCにインストールしたasciidoctor-pdf(Ruby版)を使う。
+* Asciidoc: Use Workspace Root: チェックを入れる。ワークスペースのrootパスをベースディレクトリとする。
+
+=== PlantUMLによる作図環境構築
+
+==== javaインストール
+
+``sudo apt install default-jdk``
+
+ちなみに、javaソフトウェアの実行だけならJREでもいいが、あとからJDKをインストールするのが面倒なので、ここではJDKをインストールしている。
+
+==== GraphVizインストール
+
+`sudo apt install graphviz`
+
+ちなみに、一部の図はPlantUMLが生成するためにGraphVizを使用しない。
+GraphVizが必要になる図はlink:https://plantuml.com/ja/graphviz-dot[Test your GraphViz installation]を参照。
+
+== メモ
+
+=== リンク
+
+リンクは以下のように記載する。
+
+[source, asciidoc]
+----
+// 行頭の場合、またはリンクの前後に空白を入れる場合
+http://www.example.com[リンク名]
+// 行の途中かつリンクの前後に空白を入れない場合、
+// リンクの前に"link:"を入れる
+適当なテキストlink:http://www.example.com[リンク名]また適当なテキスト
+----
+
+上記はそれぞれ以下のように表示される。
+
+http://www.example.com[リンク名]
+
+適当なテキストlink:http://www.example.com[リンク名]また適当なテキスト
+
+=== asciidoc記法のエスケープ
+
+asciidoc記法で使用する記号などの前に``\``（バックスラッシュ）を入力することでエスケープできる。
+たとえば``\*``で文字を囲むと**太字**になるが、``\``を直前に入力することで\**太字**と表示される。
+
+=== アイコン
+
+``:icons: font``アトリビュートを指定すればアイコンを表示できる。
+
+[source, asciidoc]
+----
+NOTE: NOTE
+
+TIP: TIP
+
+IMPORTANT: IMPORTANT
+
+WARNING: WARNING
+
+CAUTION: CAUTION
+----
+
+上記のソースでは、各アイコンの間の改行は必ず要る。ないと前の行の末尾に続くテキストになってしまう。
+
+レンダリング結果
+
+NOTE: NOTE
+
+TIP: TIP
+
+IMPORTANT: IMPORTANT
+
+WARNING: WARNING
+
+CAUTION: CAUTION
+
+他にも色々なアイコンを使用できる。
+
+icon:font[]
+icon:fire[] 
+icon:hand-stop-o[] 
+icon:amazon[]
+[aqua]#icon:twitter[]#
+icon:ban[]
+
+=== ソースコードのハイライト
+
+ソースコードをハイライトするには、ハイライト用ツールをインストールした上で、アトリビュートを指定する必要がある。
+
+. ハイライト用ツールをインストール: ハイライト用ツールはいくつかあるが、ここでは``rouge``をインストールする。
+
+    gem install rouge
+
+. アトリビュートを設定: `:source-highlighter: rouge`を追加
+
+=== 作図
+
+[plantuml, test_sequence, svg]
+.PlantUMLによる作図テスト
+----
+Alice --> Bob: Hello
+Bob --> Alice: こんにちは
+----
+
+svg形式で保存すると、PDF出力したときに日本語が文字化けする。
+
+[plantuml, test_component, png]
+.includeのテスト
+----
+include::graph_test.puml[]
+----
+
+以下のように書くことで、PlantUMLの図を挿入できる。
+
+```asciidoc
+[plantuml, test_sequence, svg]  # <1>
+.PlantUMLによる作図テスト       # <2>
+----
+Alice --> Bob: Hello
+----
+```
+<1> ``[言語, 図を画像ファイルとして保存するときのファイル名, 保存するときのファイル形式]``の順で記載する。ファイル名を指定しない場合は``<ランダムな英数字列>.png``として保存される。
+<2> ``.<タイトル>``で図表番号とタイトルを表示する。

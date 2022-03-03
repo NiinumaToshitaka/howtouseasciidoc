@@ -1,0 +1,6 @@
+@startuml plantuml_graph_test
+node hoge
+node fuga
+
+hoge --> fuga: 呼び出し
+@enduml
