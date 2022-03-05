@@ -191,7 +191,7 @@ Alice --> Bob: Hello
 Bob --> Alice: こんにちは
 ----
 
-デフォルトの設定では、svg形式で図を保存すると、PDF出力したときに日本語が文字化けする。
+上図の画像はsvg形式だが、デフォルトの設定ではsvg形式で図を保存するとPDF出力したときに日本語が文字化けする。
 これはPlantUMLの問題ではなく、asciidoctor-diagramが日本語を含むsvg画像を出力するときに日本語に対応したフォントを使用しないことが原因である。
 
 asciidoctor-diagramはsvg画像のテキストのフォントに``sans-serif``を使用する。
@@ -221,6 +221,8 @@ asciidoctor-pdf実行時、以下のように上記ファイルをロードす�
 ** この記事で紹介されている、asciidocotor-pdf-cjk-kai_gen_gothicをインストールする方法は、link:https://github.com/chloerei/asciidoctor-pdf-cjk-kai_gen_gothic[現在は非推奨]であるうえ、実際に試したら最新のasciidoctor-pdfでは使えなかった。
 
 asciidocでは``\->``と入力するとドキュメント生成時に**→**になるという気づきを得た。
+
+ちなみにpng形式で図を挿入するとこんな感じ。当然だがラスタ形式なのでボケる。
 
 [plantuml, test_component, png]
 .includeのテスト
@@ -283,6 +285,8 @@ role:
 *** ``:pdf-theme: default-with-fallback-font``を指定したときに読み込まれる様子。
 ** default-theme.yml
 *** 上記の``default-with-fallback-font-theme.yml``はこのファイルを拡張(``extends: default``)している様子。
+
+デフォルトのテーマファイルを作業ディレクトリにコピーして、いい感じになるように編集するのが手っ取り早いかもしれない。
 
 === 日本語フォントを導入
 
