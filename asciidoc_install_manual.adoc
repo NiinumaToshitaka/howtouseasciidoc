@@ -218,7 +218,7 @@ icon:ban[]
 
 以下のように図を挿入できる。
 
-[plantuml, test_sequence, svg]
+[plantuml, test_sequence, svg, align="center"]
 .PlantUMLによる作図テスト
 ----
 Alice --> Bob: Hello
@@ -258,7 +258,7 @@ asciidocでは``\->``と入力するとドキュメント生成時に**→**に�
 
 ちなみにpng形式で図を挿入するとこんな感じ。当然だがラスタ形式なのでボケる。
 
-[plantuml, test_component, png]
+[plantuml, test_component, png, align="right"]
 .includeのテスト
 ----
 include::graph_test.puml[]
@@ -268,14 +268,17 @@ include::graph_test.puml[]
 
 [source, asciidoc]
 ....
-[plantuml, test_sequence, svg]  # <1>
+[plantuml, test_sequence, svg, align="center"]  # <1>
 .PlantUMLによる作図テスト       # <2>
 ----
 Alice --> Bob: Hello
 ----
 ....
-<1> ``[言語, 図を画像ファイルとして保存するときのファイル名, 保存するときのファイル形式]``の順で記載する。ファイル名を指定しない場合は``<ランダムな英数字列>.png``として保存される。
+<1> ``[言語, 図を画像ファイルとして保存するときのファイル名, 保存するときのファイル形式, 配置]``の順で記載する。2番め以降の要素はなくてもいい。ファイル名を指定しない場合は``<ランダムな英数字列>.png``として保存される。``align``は``left``, ``center``, ``right``から指定できる。
 <2> ``.<タイトル>``で図表番号とタイトルを表示する。
+
+画像の配置は、デフォルトでは左側になる。
+``/var/lib/gems/2.7.0/gems/asciidoctor-pdf-1.6.2/data/themes/base-theme.yml``で``image_align: left``が定義されているので、画像を中央に配置するのをデフォルトにするには、独自のテーマファイルで``image_align: center``を定義すればよさそう。
 
 === 文字色
 
