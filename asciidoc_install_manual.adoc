@@ -1,6 +1,9 @@
 = ubuntuでのasciidocインストール手順
 // 以下の2行はアトリビュートで指定するかasciidoctor-pdf実行時に引数で渡さないと、
 // 日本語の文字が豆腐になる。
+// なお、日本語を含むPDFファイルを出力するために":scripts: cjk"の代わりに
+// "asciidoctor-pdf-cjk"アトリビュートを指定しているweb記事もあるが、
+// 現在はこのアトリビュートはメンテナンスが終了しており最新のasciidoctorでは使用できない。
 :pdf-theme: default-with-fallback-font
 :scripts: cjk
 // 画像を格納するルートディレクトリ。
@@ -20,6 +23,18 @@
 :icons: font
 // ソースコードのハイライトに使用するツールを指定
 :source-highlighter: rouge
+// ドキュメント仕様
+:asciidoctor:
+// 言語
+:lang: ja
+// ドキュメントのスタイルに冊子スタイルを指定（デフォルトは"article"）
+// "book"を指定すると、PDFに出力したときに表紙がつき、目次および章ごとに改ページされる。
+:doctype: book
+// PDF出力のためのthemeファイルを指定
+// :pdf-theme: ./theme.yaml
+// PDF用独自フォントのディレクトリを指定
+// ("GEM_FONTS_DIR"は、デフォルトフォントのPATH)
+// :pdf-fontsdir: ./fonts;GEM_FONTS_DIR
 
 == 環境
 
@@ -28,8 +43,13 @@
 == 参考文献
 
 * link:https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start[AsciiDoc文書作成入門 [AFFRIT Portal\]]
-* link:pass:[https://qiita.com/_Shallot_/items/0b5076c98155cb6f38a0][asciidoctor-pdfで日本語を含むSVG画像を扱う - Qiita]
-** URLの中に``_``で囲まれた部分があるとイタリック演算子として扱われてしまい、リンクが機能しなくなる。これを防ぐには、``\pass:[URL]``のようにすることで記号がエスケープされる。
+* https://takumon.github.io/asciidoc-syntax-quick-reference-japanese-translation/[Asciidoctor 文法クイックリファレンス(日本語訳)]
+* https://wohl-yz.net/archives/1283[仕様書が書きたくなるasciidoc Markdown風にドキュメント作成 GitHub版 | 合同会社ヴォール]
+* https://backport.net/blog/2018/03/03/asciidoctor_pdf_font_ja/[Asciidoctor PDFの日本語フォントを変更する | backport]
+* http://www.venus.dti.ne.jp/~iisaka/DocSys/cheatsheet-ja/asciidoc-869/asciidoc-869.html[AsciiDoc チートシート]
+* https://waku-take-a.github.io/asciidoctor-pdf%25E3%2581%25AB%25E3%2582%2588%25E3%2582%258BPDF%25E5%2587%25BA%25E5%258A%259B(%25E3%2583%2595%25E3%2582%25A9%25E3%2583%25B3%25E3%2583%2588).html[asciidoctor-pdfによるPDF出力(フォント): WAKU-TAKE-A  PROGRAM]
+* https://waku-take-a.github.io/%25E3%2582%25B9%25E3%2582%25BF%25E3%2582%25A4%25E3%2583%25AB%25E3%2583%2595%25E3%2582%25A1%25E3%2582%25A4%25E3%2583%25AB%25E3%2581%25AB%25E3%2581%25A4%25E3%2581%2584%25E3%2581%25A6.html[スタイルファイルについて: WAKU-TAKE-A  PROGRAM]
+* https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
 
 == 環境構築
 
@@ -158,9 +178,9 @@ icon:ban[]
 
 . ハイライト用ツールをインストール: ハイライト用ツールはいくつかあるが、ここでは``rouge``をインストールする。
 
-    gem install rouge
+    sudo gem install rouge
 
-. アトリビュートを設定: `:source-highlighter: rouge`を追加
+. アトリビュートを設定: ``:source-highlighter: rouge``を追加
 
 === 作図
 
@@ -171,7 +191,51 @@ Alice --> Bob: Hello
 Bob --> Alice: こんにちは
 ----
 
-svg形式で保存すると、PDF出力したときに日本語が文字化けする。
+svg形式で図を保存すると、PDF出力したときに日本語が文字化けする。
+これはPlantUMLの問題ではなく、asciidoctor-pdfが日本語を含むsvg画像を出力するときに日本語に対応したフォントを使用しないことが原因である。
+よって、以下のリンクを参考に設定する。
+
+--
+* link:pass:[https://qiita.com/_Shallot_/items/0b5076c98155cb6f38a0][asciidoctor-pdfで日本語を含むSVG画像を扱う - Qiita]
+** URLの中に``_``で囲まれた部分があるとイタリック演算子として扱われてしまい、リンクが機能しなくなる。これを防ぐには、``\pass:[URL]``のように``pass``でURLを囲むことで記号がエスケープされる。
+** この記事で紹介されている方法はlink:https://github.com/chloerei/asciidoctor-pdf-cjk-kai_gen_gothic[現在は非推奨]なので、別の方法をとるべき。
+--
+
+. ``asciidocotor-pdf-cjk-kai_gen_gothic``をインストールする
+
+    sudo gem install asciidoctor-pdf-cjk-kai_gen_gothic
+
+. フォントをダウンロード
+
+    sudo asciidoctor-pdf-cjk-kai_gen_gothic-install
+
+. Prawn-SVGに日本語フォントを指定するコードを追加する。以下のファイルを適当な場所に配置する。
++
+[source, ruby, linenum]
+.config.rb
+----
+Prawn::Svg::Font::GENERIC_CSS_FONT_MAPPING.merge!(
+  'sans-serif' => 'KaiGen Gothic JP'
+)
+----
++
+. asciidoc-pdfコマンドを実行する。ここでは上記の``.config.rb``を変換対象のasciidocファイルと同じディレクトリに配置したものとする。
+
+    asciidoctor-pdf -r asciidoctor-diagram -r ./config.rb -r asciidoctor-pdf-cjk-kai_gen_gothic -a pdf-style=KaiGenGothicJP <asciidocファイル>
+
+->上記を試したらasciidoctor-pdfとasciidoctor-pdf-cjkのバージョンがconflictしてエラーになった。asciidoctor-pdf-cjkが古すぎるので、やはり推奨されている、カスタムフォントを使用する方法を使うべき。
+
+``\->``と入力するとドキュメント生成時に**→**になるという気づきを得た。
+
+フォント設定は以下のwebページが参考になる。
+
+* https://mochimoffu.hateblo.jp/entry/2019/09/26/003000[ドキュメント作成の話～Asciidocを使えるようにする～ - 困った時の自分用メモ]
+* https://qiita.com/kuboaki/items/67774c5ebd41467b83e2[asciidoctor-pdfでかっこいいPDFを作る(1) - Qiita]
+* https://github.com/asciidoctor/asciidoctor-pdf/blob/main/docs/theming-guide.adoc#custom-fonts[asciidoctor-pdf/theming-guide.adoc at main · asciidoctor/asciidoctor-pdf · GitHub]
+** asciidoctor-pdf公式のテーマ設定ガイド
+* https://backport.net/blog/2018/03/03/asciidoctor_pdf_font_ja/[Asciidoctor PDFの日本語フォントを変更する | backport]
+* https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
+* https://wohl-yz.net/archives/1683[Docker版 仕様書が書きたくなるAsciiDoc Markdown風にドキュメント作成 | 合同会社ヴォール]
 
 [plantuml, test_component, png]
 .includeのテスト
@@ -181,12 +245,31 @@ include::graph_test.puml[]
 
 以下のように書くことで、PlantUMLの図を挿入できる。
 
-```asciidoc
+[source, asciidoc]
+....
 [plantuml, test_sequence, svg]  # <1>
 .PlantUMLによる作図テスト       # <2>
 ----
 Alice --> Bob: Hello
 ----
-```
+....
 <1> ``[言語, 図を画像ファイルとして保存するときのファイル名, 保存するときのファイル形式]``の順で記載する。ファイル名を指定しない場合は``<ランダムな英数字列>.png``として保存される。
 <2> ``.<タイトル>``で図表番号とタイトルを表示する。
+
+=== 文字色
+
+[red]*赤色の文字* と [big red yellow-background]*はっきりとした赤色の文字* + 
+[underline]*下線入りの文字* と [overline]*上線入りの文字* +
+[blue line-through]*取り消し線入り青色の文字*
+
+なお、``asciidoctor-pdf``のデフォルト設定でPDFに出力すると、文字色が反映されない。
+これはスタイルファイル(テーマファイル)におけるRoleカテゴリーを定義することで対応する。
+詳細はlink:https://waku-take-a.github.io/asciidoctor-pdf%25E3%2581%25AB%25E3%2582%2588%25E3%2582%258BPDF%25E5%2587%25BA%25E5%258A%259B(%25E6%2596%2587%25E5%25AD%2597%25E8%2589%25B2).html[asciidoctor-pdfによるPDF出力(文字色): WAKU-TAKE-A  PROGRAM]を参照。
+
+デフォルトのテーマ設定ファイル: ``/var/lib/gems/2.7.0/gems/asciidoctor-pdf-1.6.2/data/themes/default-theme.yml``
+
+pdf出力時のテーマを指定する``:pdf-theme:``アトリビュートでは``default-with-fallback-font``を指定しているから、上記ファイルではなく``default-with-fallback-font-theme.yml``を参照するべき？
+
+=== 日本語フォントを導入
+
+https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start[AsciiDoc文書作成入門 [AFFRIT Portal\]]の"8.1. 日本語フォントの導入"を参考にする。
