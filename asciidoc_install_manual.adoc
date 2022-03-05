@@ -1,6 +1,6 @@
 = ubuntuでのasciidocインストール手順
 // PDF化に使用するテーマファイルを指定
-:pdf-theme: ./default-with-fallback-font-theme.yml
+:pdf-theme: ./theme.yml
 // PDF用独自フォントのディレクトリを指定
 // ("GEM_FONTS_DIR"は、デフォルトフォントのPATH)
 :pdf-fontsdir: ./fonts;GEM_FONTS_DIR

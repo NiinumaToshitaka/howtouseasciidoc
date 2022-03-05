@@ -2,7 +2,6 @@ extends: default-with-fallback-font
 font:
   catalog:
     merge: true
-    # MigMix 1p
     MigMix 1P:
       normal: migmix-1p-regular.ttf
       bold: migmix-1p-bold.ttf
