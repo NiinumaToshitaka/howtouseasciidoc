@@ -33,6 +33,40 @@
 // ドキュメントのスタイルに冊子スタイルを指定（デフォルトは"article"）
 // "book"を指定すると、PDFに出力したときに表紙がつき、目次および章ごとに改ページされる。
 :doctype: book
+// bookスタイルで、章レベルのタイトルの先頭の文字列を指定する。
+// デフォルトだと"Chapter"がついて邪魔なので、何も指定しないことでこれを無効にする。
+:chapter-label:
+// 本文(第1章)の前の文章タイトルを"まえがき"にする。
+// 指定しない場合、本文の前に文章タイトルが入らない。目次にも記載されない。
+:preface-title: まえがき
+// Appendixのタイトルを"付録"とする
+:appendix-caption: 付録
+// 図(image)のキャプションを"図"とする(Figure)
+:figure-caption: 図
+// 表のキャプションを"表"とする(Table)
+:table-caption: 表
+// リストのキャプションを"リスト"とする。
+// なお:icons:アトリビュートが有効な場合、各種脚注のキャプションは
+// 対応するアトリビュートの設定にかかわらずアイコンで表示される。
+:listing-caption: リスト
+// Exampleキャプションを"例"とする
+:example-caption: 例
+// NOTEのキャプションを"注記"とする
+:note-caption: 注記
+// TIPのキャプションを"ヒント"とする
+:tip-caption: ヒント
+// COUTIONのキャプションを"注意"とする
+:caution-caption: 注意
+// WARNINGのキャプションを"警告"とする
+:warning-caption: 警告
+// IMPORTANTのキャプションを"重要"とする
+:important-caption: 重要
+// バージョンのラベルを"Ver."とする
+:version-label: Ver.
+// last-updateのラベルを"最終更新"とする
+:last-update-label: 最終更新
+
+これはまえがき
 
 == 環境
 
@@ -306,3 +340,13 @@ asciidoctor: ERROR: could not locate or load the built-in pdf theme `./theme.yam
 * https://backport.net/blog/2018/03/03/asciidoctor_pdf_font_ja/[Asciidoctor PDFの日本語フォントを変更する | backport]
 * https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
 * https://wohl-yz.net/archives/1683[Docker版 仕様書が書きたくなるAsciiDoc Markdown風にドキュメント作成 | 合同会社ヴォール]
+
+[appendix]
+== 最初の付録
+
+=== 最初の節
+
+=== 次の節
+
+[appendix]
+== 次の付録
