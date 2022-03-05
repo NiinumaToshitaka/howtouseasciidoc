@@ -1,10 +1,13 @@
 = ubuntuでのasciidocインストール手順
-// 以下の2行はアトリビュートで指定するかasciidoctor-pdf実行時に引数で渡さないと、
-// 日本語の文字が豆腐になる。
-// なお、日本語を含むPDFファイルを出力するために":scripts: cjk"の代わりに
+// PDF化に使用するテーマファイルを指定
+:pdf-theme: ./default-with-fallback-font-theme.yml
+// PDF用独自フォントのディレクトリを指定
+// ("GEM_FONTS_DIR"は、デフォルトフォントのPATH)
+:pdf-fontsdir: ./fonts;GEM_FONTS_DIR
+// 日本語と英語が混在した文書で、ワードラップ(改行位置)を修正する。
+// 日本語を含むPDFファイルを出力するために":scripts: cjk"の代わりに
 // "asciidoctor-pdf-cjk"アトリビュートを指定しているweb記事もあるが、
 // 現在はこのアトリビュートはメンテナンスが終了しており最新のasciidoctorでは使用できない。
-:pdf-theme: default-with-fallback-font
 :scripts: cjk
 // 画像を格納するルートディレクトリ。
 // このアトリビュートを設定した場合、たとえば"images:hoge.png[]"のように記載したとき、
@@ -30,11 +33,6 @@
 // ドキュメントのスタイルに冊子スタイルを指定（デフォルトは"article"）
 // "book"を指定すると、PDFに出力したときに表紙がつき、目次および章ごとに改ページされる。
 :doctype: book
-// PDF出力のためのthemeファイルを指定
-// :pdf-theme: ./theme.yaml
-// PDF用独自フォントのディレクトリを指定
-// ("GEM_FONTS_DIR"は、デフォルトフォントのPATH)
-// :pdf-fontsdir: ./fonts;GEM_FONTS_DIR
 
 == 環境
 
@@ -236,6 +234,23 @@ Prawn::Svg::Font::GENERIC_CSS_FONT_MAPPING.merge!(
 * https://backport.net/blog/2018/03/03/asciidoctor_pdf_font_ja/[Asciidoctor PDFの日本語フォントを変更する | backport]
 * https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
 * https://wohl-yz.net/archives/1683[Docker版 仕様書が書きたくなるAsciiDoc Markdown風にドキュメント作成 | 合同会社ヴォール]
+
+asciidoctor-diagramはsvg画像のテキストのフォントに``sans-serif``を使用する。
+asciidoctor-diagramのフォントは変更できないので、以下のrubyスクリプトにより``sans-serif``を日本語フォントにマッピングする。
+
+[source, ruby, linenum]
+.config.rb
+----
+Prawn::Svg::Font::GENERIC_CSS_FONT_MAPPING.merge!(
+  # 'MigMix 1P'フォントを使用する場合
+  'sans-serif' => 'MigMix 1P'
+)
+----
+
+そしてasciidoctor-pdf実行時に以下のように上記ファイルをロードする。
+
+``$ asciidoctor-pdf -r asciidoctor-diagram -r ./config.rb hoge.adoc
+``
 
 [plantuml, test_component, png]
 .includeのテスト
