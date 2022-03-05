@@ -1,4 +1,7 @@
+# デフォルトテーマを拡張するため、"extends:"を指定
 extends: default-with-fallback-font
+# 「フォントカタログ」にフォントを追加する。 
+# 標準フォントも使う場合、"merge: true"によりマージを有効にする。
 font:
   catalog:
     merge: true
@@ -7,4 +10,22 @@ font:
       bold: migmix-1p-bold.ttf
       italic: migmix-1p-regular.ttf
       bold_italic: migmix-1p-bold.ttf
+  # フォールバックフォントに日本語フォント(MigMix 1P)を指定する。
+  # フォールバックフォントとは、指定されたフォントに対応する文字がない場合に
+  # 使用されるフォントである。
   fallbacks: [MigMix 1P, M+ 1p Fallback, Noto Emoji]
+# 文字色を定義。
+# 定義しないとPDF化したときに文字に色がつかない。
+role:
+  red:
+    font_color: ff0000
+  yellow:
+    font_color: ffff00
+  green:
+    font_color: 008000
+  aqua:
+    font_color: 00ffff
+  blue:
+    font_color: 0000ff
+  navy:
+    font_color: 000080

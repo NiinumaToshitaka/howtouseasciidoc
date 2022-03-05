@@ -248,16 +248,50 @@ Alice --> Bob: Hello
 [blue line-through]*取り消し線入り青色の文字*
 
 なお、``asciidoctor-pdf``のデフォルト設定でPDFに出力すると、文字色が反映されない。
-これはスタイルファイル(テーマファイル)におけるRoleカテゴリーを定義することで対応する。
-詳細はlink:https://waku-take-a.github.io/asciidoctor-pdf%25E3%2581%25AB%25E3%2582%2588%25E3%2582%258BPDF%25E5%2587%25BA%25E5%258A%259B(%25E6%2596%2587%25E5%25AD%2597%25E8%2589%25B2).html[asciidoctor-pdfによるPDF出力(文字色): WAKU-TAKE-A  PROGRAM]を参照。
+これはテーマファイルにおけるRoleカテゴリーを定義することで対応する。
 
-デフォルトのテーマ設定ファイル: ``/var/lib/gems/2.7.0/gems/asciidoctor-pdf-1.6.2/data/themes/default-theme.yml``
+テーマファイルに以下のようにルールを追加する。
 
-pdf出力時のテーマを指定する``:pdf-theme:``アトリビュートでは``default-with-fallback-font``を指定しているから、上記ファイルではなく``default-with-fallback-font-theme.yml``を参照するべき？
+[source, yaml]
+----
+role:
+  red:
+    font_color: ff0000
+  yellow:
+    font_color: ffff00
+  green:
+    font_color: 008000
+  aqua:
+    font_color: 00ffff
+  blue:
+    font_color: 0000ff
+  navy:
+    font_color: 000080
+----
+
+テーマファイルで色のルールを設定するので、**設定していない色は使えない**ことに注意。
+
+詳細は以下を参照。
+
+* https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start#%E3%82%B9%E3%82%BF%E3%82%A4%E3%83%AB%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%A4%89%E6%9B%B4[AsciiDoc文書作成入門 [AFFRIT Portal\]]の"リスト 42. その他の設定変更"
+* https://waku-take-a.github.io/asciidoctor-pdf%25E3%2581%25AB%25E3%2582%2588%25E3%2582%258BPDF%25E5%2587%25BA%25E5%258A%259B(%25E6%2596%2587%25E5%25AD%2597%25E8%2589%25B2).html[asciidoctor-pdfによるPDF出力(文字色): WAKU-TAKE-A  PROGRAM]
+
+デフォルトのテーマ設定ファイルは以下を参照。
+
+* ``/var/lib/gems/2.7.0/gems/asciidoctor-pdf-1.6.2/data/themes/``
+** default-with-fallback-font-theme.yml
+*** ``:pdf-theme: default-with-fallback-font``を指定したときに読み込まれる様子。
+** default-theme.yml
+*** 上記の``default-with-fallback-font-theme.yml``はこのファイルを拡張(``extends: default``)している様子。
 
 === 日本語フォントを導入
 
-https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start[AsciiDoc文書作成入門 [AFFRIT Portal\]]の"8.1. 日本語フォントの導入"を参照。
+https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88%E3%81%AE%E5%88%A9%E7%94%A8[AsciiDoc文書作成入門 [AFFRIT Portal\]]の"8. 日本語フォントの利用"を参照。
+ただし、themeファイルの拡張子は``.yml``である必要がある。yaml形式だからといって``.yaml``にすると、以下のようなエラーが発生する。
+
+....
+asciidoctor: ERROR: could not locate or load the built-in pdf theme `./theme.yaml'; reverting to default theme
+....
 
 フォント設定は以下のwebページが参考になる。
 
