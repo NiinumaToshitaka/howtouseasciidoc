@@ -1,0 +1,52 @@
+=== rubyインストール
+
+asciidoctor（後述）はubuntuのパッケージ管理システムにも登録されているが、RubyGem (gem)パッケージとして配布されているものを使用するのが一般的なようなので、rubyをインストールする。
+
+ここでは簡単のためにパッケージ管理システムを使用してインストールする。
+ただしlink:https://www.ruby-lang.org/ja/documentation/installation/#package-management-systems[Rubyのインストール]によると、パッケージ管理システムに登録されているバージョンは最新ではないので推奨されていない。
+
+``sudo apt install ruby``
+
+=== asciidoctorインストール
+
+asciidocの処理系としてasciidoctorを使用する。
+というか他の処理系あるの？
+
+`sudo gem install asciidoctor asciidoctor-pdf asciidoctor-diagram`
+
+* `asciidoctor`: HTMLに変換するのに使う
+* `asciidoctor-pdf`: PDFに変換するのに使う
+* `asciidoctor-diagram`: PlantUMLなどの図をレンダリングするために使うasciidoc拡張
+
+=== vscodeインストール
+
+Visual Studio Code(vscode)の拡張機能を使うと、asciidocテキストを編集したりプレビューしたりするのが簡単にできるので、ここではasciidocテキストのエディタとしてvscodeを使う。
+
+Ubuntu Softwareからvscodeをインストールすると日本語を入力できないので、link:https://code.visualstudio.com[Visual Studio Code - Code Editing. Redefined]からdebパッケージをダウンロードしてインストールする。
+
+=== vscodeのasciidoc拡張機能をインストール
+
+拡張機能タブで``asciidoctor.asciidoctor-vscode``を検索してインストールする。
+ファイルの拡張子を``.adoc``にして保存すると、asciidocテキストのハイライトが有効になる。
+
+vscodeの設定画面を開き、以下のとおり設定する。
+
+* Asciidoc: Asciidoctor_command: `asciidoctor -r asciidoctor-diagram -a outdir=.asciidoctor -a imagesdir=.asciidoctor -a imagesoutdir=.asciidoctor`
+* Asciidoc: Use_asciidoctor_js: チェックを外す。JavaScript版のasciidoctorを使わず、PCにインストールしたasciidoctor(Ruby版)を使う。
+* Asciidoc: Use_asciidoctorpdf: チェックを入れる。PCにインストールしたasciidoctor-pdf(Ruby版)を使う。
+* Asciidoc: Use Workspace Root: チェックを入れる。ワークスペースのrootパスをベースディレクトリとする。
+
+=== PlantUMLによる作図環境構築
+
+==== javaインストール
+
+``sudo apt install default-jdk``
+
+ちなみに、javaソフトウェアの実行だけならJREでもいいが、あとからJDKをインストールするのが面倒なので、ここではJDKをインストールしている。
+
+==== GraphVizインストール
+
+`sudo apt install graphviz`
+
+ちなみに、一部の図はPlantUMLが生成するためにGraphVizを使用しない。
+GraphVizが必要になる図はlink:https://plantuml.com/ja/graphviz-dot[Test your GraphViz installation]を参照。
