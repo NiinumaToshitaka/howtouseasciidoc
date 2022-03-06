@@ -70,7 +70,7 @@
 
 == 環境
 
-* OS: Ubuntu 20.04 LTS
+OS:: Ubuntu 20.04 LTS
 
 == 参考文献
 
@@ -162,7 +162,9 @@ http://www.example.com[リンク名]
 === asciidoc記法のエスケープ
 
 asciidoc記法で使用する記号などの前に``\``（バックスラッシュ）を入力することでエスケープできる。
-たとえば``\*``で文字を囲むと**太字**になるが、``\``を直前に入力することで\**太字**と表示される。
+たとえば``\*``（前後に空白がない場合は``pass:[**]``）で文字を囲むと**太字**になるが、``\``を直前に入力することで\**太字**と表示される。
+
+あるいは文字列を``\pass:[文字列]``のようにpassで囲むことでもエスケープできる。
 
 === アイコン
 
@@ -280,6 +282,16 @@ Alice --> Bob: Hello
 画像の配置は、デフォルトでは左側になる。
 ``/var/lib/gems/2.7.0/gems/asciidoctor-pdf-1.6.2/data/themes/base-theme.yml``で``image_align: left``が定義されているので、画像を中央に配置するのをデフォルトにするには、独自のテーマファイルで``image_align: center``を定義すればよさそう。
 
+タイミングチャートの線の色を信号ごとに変えるのは、需要がないのか対応しているツールが見当たらない。
+どうしても線の色を変えたければ、諦めてexcelなりpowerpointなり他の作図ツールなりを使って手動で作図するしかないかもしれない。
+あるいはpythonとかでタイミングチャートっぽいグラフを作図して挿入するとか。
+
+[plantuml, timing_chart_test, svg, align="center"]
+.タイミングチャートの作図テスト
+----
+include::timing_chart_test.puml[]
+----
+
 === 文字色
 
 [red]*赤色の文字* と [big red yellow-background]*はっきりとした赤色の文字* + 
@@ -343,6 +355,60 @@ asciidoctor: ERROR: could not locate or load the built-in pdf theme `./theme.yam
 * https://backport.net/blog/2018/03/03/asciidoctor_pdf_font_ja/[Asciidoctor PDFの日本語フォントを変更する | backport]
 * https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
 * https://wohl-yz.net/archives/1683[Docker版 仕様書が書きたくなるAsciiDoc Markdown風にドキュメント作成 | 合同会社ヴォール]
+
+=== 表
+ 
+[cols="<3,^2", options="header", width="60%"]
+.表題
+|====
+|テキスト                         | 表示
+|`\*強調*`                        | *強調*
+|`\{plus}`                        | {plus}
+|`\#マーカー#`                    | #マーカー#
+|`[.underline]\#アンダーライン#`  | [.underline]#アンダーライン#
+|====
+
+[cols="2,2,5a"]
+.表を入れ子にしてセル要素にasciidoc構文を使う
+|===
+|Firefox
+|ブラウザ
+|FirefoxはオープンソースのWEBブラウザです。
+
+下記のような特徴があります。:
+
+* 標準仕様準拠
+* 高パフォーマンス
+* 高い可搬性
+
+http://getfirefox.com[Firefoxをダウンロードする]!
+
+[cols="2,2,5a"]
+!===
+!Firefox
+!ブラウザ
+!FirefoxはオープンソースのWEBブラウザです。
+下記のような特徴があります。:
+
+* 標準仕様準拠
+* 高パフォーマンス
+* 高い可搬性
+
+http://getfirefox.com[Firefoxをダウンロードする]
+!===
+
+|===
+
+[cols="e,m,^,>s", width="25%"]
+.整形、セル結合
+|===
+|1 >s|2 |3 |4
+^|5 2.2+^.^|6 .3+<.>m|7
+^|8
+|9 2+>|10
+|===
+
+セル結合すると一気にコードが暗号めいてくる。プレビューせずにどのようにレンダリングされるのか想像するのはまず無理。
 
 [appendix]
 == 最初の付録
