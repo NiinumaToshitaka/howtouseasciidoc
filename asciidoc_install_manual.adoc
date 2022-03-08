@@ -19,7 +19,7 @@
 // 章番号を振る
 :sectnums:
 // 目次を入れる
-:toc:
+:toc: left
 // 目次のタイトルを設定する。指定しない場合は"Table of Contents"になる。
 :toc-title: 目次
 // アイコンをレンダリングするのに必要
