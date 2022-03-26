@@ -150,3 +150,47 @@ asciidoctor-pdf実行時、以下のように上記ファイルをロードす�
 * link:pass:[https://qiita.com/_Shallot_/items/0b5076c98155cb6f38a0][asciidoctor-pdfで日本語を含むSVG画像を扱う - Qiita]
 ** asciidocでは、URLの中に``_``で囲まれた部分があるとイタリック演算子として扱われてしまい、リンクが機能しなくなる。これを防ぐには、``\pass:[URL]``のように``pass``でURLを囲むことで記号をエスケープする。
 ** この記事で紹介されている、asciidocotor-pdf-cjk-kai_gen_gothicをインストールする方法は、link:https://github.com/chloerei/asciidoctor-pdf-cjk-kai_gen_gothic[現在は非推奨]であるうえ、実際に試したら最新のasciidoctor-pdfでは使えなかった。
+
+==== 日本語の文字の間隔が詰まる現象の対策
+
+ubuntu on WSLの環境だと，日本語の文字の間隔が詰まって見栄えが悪い。
+これはwindowsとubuntu on WSLの環境でインストールされているフォントが異なるのが原因である。
+
+PlantUMLで生成されるsvg画像のフォントには``sans-serif``が使用されるが，このフォントで日本語を表示したときの文字の間隔が，windowsとubuntu on WSLで異なる。
+
+NOTE: <<_日本語の文字化け対策, 日本語の文字化け対策>>の方法で``sans-serif``を日本語フォントにマッピングすれば解決するかもしれない。
+
+PlantUMLで以下のダイアグラムを生成すると，PlantUMLで使用可能なフォントの一覧が表示される。
+
+[source, plain]
+----
+@startuml available_fonts
+listfonts ここで指定したテキストがサンプルとして表示される
+@enduml
+----
+
+下図は上記のコードにより生成した，このドキュメントを生成した環境で使用可能なフォントの一覧である。
+
+[plantuml, available_fonts, svg]
+----
+@startuml available_fonts
+listfonts ここで指定したテキストがサンプルとして表示される
+@enduml
+----
+
+フォントを変更するには，ダイアグラム内に以下のコードを追加する。
+
+[source, plantuml]
+----
+skinparam {
+  defaultFontName フォント名
+}
+----
+
+なお，PlantUMLでは別のファイルをインクルードすることができる。
+以下の例では，``inc/color.inc``に記載された内容をインクルードする。
+
+[source, plantuml]
+----
+!include inc/color.inc
+----

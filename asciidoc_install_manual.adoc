@@ -15,6 +15,8 @@
 :imagesdir: .asciidoctor
 // asciidoctorが図の画像ファイルを出力するときの保存先ディレクトリ
 :imagesoutdir: .asciidoctor
+// ダイアグラム画像のキャッシュディレクトリ
+// 指定しない場合，ソースファイルのディレクトリに".asciidoctor"という名前のディレクトリが作成される
 :outdir: .asciidoctor
 // 章番号を振る
 :sectnums:
@@ -26,7 +28,7 @@
 :icons: font
 // ソースコードのハイライトに使用するツールを指定
 :source-highlighter: rouge
-// ドキュメント仕様
+// ドキュメント仕様。AsciiDoctorによる拡張構文を使用する。
 :asciidoctor:
 // 言語
 :lang: ja
