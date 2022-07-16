@@ -63,8 +63,18 @@
 :warning-caption: 警告
 // IMPORTANTのキャプションを"重要"とする
 :important-caption: 重要
-// バージョンのラベルを"Ver."とする
-:version-label: Ver.
+// バージョンのラベルを"commit: "とする
+:version-label: commit: 
+// バージョン番号を定義
+// asciidoctorコマンド実行時に引数で
+// "-acommit-hash=[コミットID]"
+// を実行すると，"commit-hash"にコミットIDを渡すことができる
+:revnumber: {commit-hash}
+// バージョン日時
+// asciidoctorコマンド実行時に引数で
+// "-acommit-date=[コミット日時]"
+// を実行すると，"commit-date"にコミット日時を渡すことができる
+:revdate: {commit-date}
 // last-updateのラベルを"最終更新"とする
 :last-update-label: 最終更新
 
