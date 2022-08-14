@@ -163,13 +163,15 @@ docker run \
   --name kroki \#<2>
   --publish {kroki-publish-port}:8000 \#<3>
   --network asciidoctor \#<4>
-  yuzutech/kroki:0.17.2 #<5>
+  --detach \#<5>
+  yuzutech/kroki:0.17.2 #<6>
 ----
 <1> 実行終了時にコンテナを削除する（コンテナを残しておく必要がないため）
 <2> コンテナ名を指定する（必須ではないが名前を固定したほうがわかりやすい）
 <3> ホスト側に公開するポート番号を割り当てる。{kroki-publish-port}番が既に使用されている場合は別のポート番号を割り当てる。たとえば `--publish 1234:8000` とすると、ホスト側からは http://localhost:1234 からアクセスできる。
 <4> <<create-bridge-network>>で作成したネットワークに接続する
-<5> https://hub.docker.com/r/yuzutech/kroki[Kroki公式のイメージ配布ページ] から、最新のイメージのバージョンを確認して使用する
+<5> バックグラウンドでコンテナを実行する
+<6> https://hub.docker.com/r/yuzutech/kroki[Kroki公式のイメージ配布ページ] から、最新のイメージのバージョンを確認して使用する
 
 上記コマンド実行後、ホスト側から http://localhost:{kroki-publish-port} にアクセスできることを確認する。
 
