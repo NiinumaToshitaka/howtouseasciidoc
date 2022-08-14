@@ -295,6 +295,8 @@ http://getfirefox.com[Firefoxをダウンロードする]
 
 セル結合すると一気にコードが暗号めいてくる。プレビューせずにどのようにレンダリングされるのか想像するのはまず無理。
 
+セル結合については https://qiita.com/kob58im/items/2f8a9a5a60f445b083b0[AsciiDocの表(Table)のcols属性の仕様＆Asciidoctorの内部実装について調べてみた - Qiita] が参考になる。
+
 [appendix]
 == 最初の付録
 
