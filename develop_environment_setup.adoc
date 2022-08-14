@@ -56,7 +56,7 @@ Server: Docker Engine - Community
 [[pull-docker-image]]
 === Dockerイメージをpull
 
-https://hub.docker.com/r/asciidoctor/docker-asciidoctor/[asciidoctor/docker-asciidoctor - Docker Image | Docker Hub] で最新のイメージのバージョンを確認する。
+<<docker-asciidoctor>>で最新のイメージのバージョンを確認する。
 執筆時の最新バージョンは{docker-asciidoctor-latest}だった。
 
 最新バージョンを確認したら、以下のコマンドによりDockerイメージをpullする。
@@ -87,8 +87,8 @@ docker run \
 
 === vscodeでAsciiDocファイルを編集
 
-vscodeの https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers[Remote - Containers] 拡張機能を使用して、コンテナ内に環境を構築する。
-この拡張機能の仕組みは https://code.visualstudio.com/docs/remote/containers[Developing inside a Container using Visual Studio Code Remote Development] を参照。
+vscodeの"Remote - Containers"拡張機能<<remote-containers-extension>>を使用して、コンテナ内に環境を構築する。
+この拡張機能の仕組みは<<developing-inside-container>>を参照。
 
 ==== 拡張機能をインストール
 
@@ -120,6 +120,8 @@ FROM asciidoctor/docker-asciidoctor:{docker-asciidoctor-latest}
 ワークスペースで有効化したい拡張機能がある場合、 `.devcontainer/devcontainer.json` の"customizations -> vscode -> extensions"に拡張機能IDを記載することで、次回起動時に自動的に拡張機能がインストールされる。
 
 直接上記の設定ファイルを編集する代わりに、拡張機能画面で追加したい拡張機能を右クリックして"Add to devcontainer.json"を選択してもよい。
+
+どのDockerコンテナに対しても常にインストールしたい拡張機能がある場合、<<always-installed-extensions>>に従い設定する。
 
 == ローカル環境に直接各種ソフトウェアをインストールする
 
@@ -319,3 +321,11 @@ skinparam {
 ----
 !include inc/color.inc
 ----
+
+[bibliography]
+== 参考文献
+
+* [[[always-installed-extensions, 1]]] https://code.visualstudio.com/docs/remote/containers#_always-installed-extensions
+* [[[remote-containers-extension, 2]]] https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers
+* [[[developing-inside-container, 3]]] https://code.visualstudio.com/docs/remote/containers[Developing inside a Container using Visual Studio Code Remote Development]
+* [[[docker-asciidoctor, 4]]] https://hub.docker.com/r/asciidoctor/docker-asciidoctor/[asciidoctor/docker-asciidoctor - Docker Image | Docker Hub]
