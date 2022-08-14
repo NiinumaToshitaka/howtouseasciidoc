@@ -1,0 +1,35 @@
+# 以下ページのDocker Compose Fileから不要なものを削除して、
+# "docker-asciidoctor"イメージのコンテナを追加した。
+# <https://docs.kroki.io/kroki/setup/use-docker-or-podman/#_run_multiple_kroki_containers_together>
+version: "3"
+services:
+  asciidoctor:
+    image: asciidoctor/docker-asciidoctor:1.28
+    depends_on:
+      - kroki
+    volumes:
+      # AsciiDoctorのGithubリポジトリでは、
+      # カレントディレクトリをコンテナの"/documents"にマウントしていたので、
+      # これに合わせる。
+      - ../:/documents
+    # 以下ページの"overrideCommand"によると、
+    # Dockerfileを使用してvscodeにアタッチした場合、
+    # 下記のコマンドが自動的にコンテナのフォアグランドで実行される。
+    # コンテナはフォアグランドで実行されるプロセスが存在しないと
+    # 自動的に終了してしまうため、これを防ぐために適当なプロセスを実行しておく必要がある。
+    # Docker Compose Fileを使用した場合はコンテナ内で自動的にコマンドが実行されないため、
+    # 明示的にコマンドを指定する必要がある。
+    # <https://code.visualstudio.com/docs/remote/devcontainerjson-reference#_general-devcontainerjson-properties>
+    command: /bin/sh -c "while sleep 1000; do :; done"
+  kroki:
+    image: yuzutech/kroki:0.17.2
+    depends_on:
+      - mermaid
+    environment:
+      - KROKI_MERMAID_HOST=mermaid
+    ports:
+      - "8000:8000"
+  mermaid:
+    image: yuzutech/kroki-mermaid:0.17.2
+    expose:
+      - "8002"

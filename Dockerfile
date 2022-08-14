@@ -1,1 +1,0 @@
-FROM asciidoctor/docker-asciidoctor:1.28
