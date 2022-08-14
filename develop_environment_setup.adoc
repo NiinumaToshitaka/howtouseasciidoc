@@ -2,12 +2,15 @@
 include::base_attributes.adoc[]
 // AsciiDoctorのDockerイメージの最新バージョン
 :docker-asciidoctor-latest: 1.28
+// Krokiコンテナがホスト側に公開するポート番号
+:kroki-publish-port: 8000
 
 AsciiDocの執筆環境を構築するには、以下の2種類の方法がある。
 
 * ローカル環境に直接各種ソフトウェアをインストールする
 * AsciiDoctorの公式から提供されているDockerイメージを使用する
 
+[[use-docker-image-of-asciidoctor]]
 == Dockerイメージを使用する
 
 === 環境
@@ -85,6 +88,15 @@ docker run \
 <4> 上でpullしたDockerイメージを指定する。
 <5> AsciiDoctorを実行する。
 
+[IMPORTANT]
+====
+上記のDockerイメージには"Asciidoctor Kroki"も含まれている。
+しかし、この拡張機能はデフォルトでは作図するために情報を https://kroki.io に送信する。
+情報をインターネット上のサーバに送信したくない場合、自前でKrokiサーバを立てる必要がある。
+
+Krokiサーバを立てる手順は<<convert-diagram-by-kroki>>を参照。
+====
+
 === vscodeでAsciiDocファイルを編集
 
 vscodeの"Remote - Containers"拡張機能<<remote-containers-extension>>を使用して、コンテナ内に環境を構築する。
@@ -92,7 +104,10 @@ vscodeの"Remote - Containers"拡張機能<<remote-containers-extension>>を使�
 
 ==== 拡張機能をインストール
 
-拡張機能画面から"Remote - Containers"をインストールする。
+拡張機能画面から以下の拡張機能をインストールする。
+
+* Remote - Containers
+* AsciiDoc
 
 [[put-dockerfile]]
 ==== Dockerfileを配置
@@ -122,6 +137,95 @@ FROM asciidoctor/docker-asciidoctor:{docker-asciidoctor-latest}
 直接上記の設定ファイルを編集する代わりに、拡張機能画面で追加したい拡張機能を右クリックして"Add to devcontainer.json"を選択してもよい。
 
 どのDockerコンテナに対しても常にインストールしたい拡張機能がある場合、<<always-installed-extensions>>に従い設定する。
+
+[[convert-diagram-by-kroki]]
+=== 作図にKrokiを使用する
+
+[[create-bridge-network]]
+==== ブリッジネットワークを作成
+
+AsciiDoctorコンテナとKrokiコンテナの間で通信する必要があるので、ブリッジネットワークを作成する。
+ここでは `asciidoctor` という名前で作成する。
+
+[source, console, linenums]
+----
+$ docker network create asciidoctor
+4f41b56b14e5be913ce37ad96979ae22bfca47735029b383cf9893542350c5f1
+----
+
+[[run-kroki-container]]
+==== コンテナ実行
+
+[source, bash, subs="attributes+"]
+----
+docker run \
+  --rm \#<1>
+  --name kroki \#<2>
+  --publish {kroki-publish-port}:8000 \#<3>
+  --network asciidoctor \#<4>
+  yuzutech/kroki:0.17.2 #<5>
+----
+<1> 実行終了時にコンテナを削除する（コンテナを残しておく必要がないため）
+<2> コンテナ名を指定する（必須ではないが名前を固定したほうがわかりやすい）
+<3> ホスト側に公開するポート番号を割り当てる。{kroki-publish-port}番が既に使用されている場合は別のポート番号を割り当てる。たとえば `--publish 1234:8000` とすると、ホスト側からは http://localhost:1234 からアクセスできる。
+<4> <<create-bridge-network>>で作成したネットワークに接続する
+<5> https://hub.docker.com/r/yuzutech/kroki[Kroki公式のイメージ配布ページ] から、最新のイメージのバージョンを確認して使用する
+
+上記コマンド実行後、ホスト側から http://localhost:{kroki-publish-port} にアクセスできることを確認する。
+
+[CAUTION]
+====
+`yuzutech/kroki` イメージ単体だと、PlantUMLの図はレンダリングできるが、Mermaidなどいくつかの図はレンダリングできない。他のコンテナを立てる必要がある。
+
+他のコンテナを立てる手順は<<run-multiple-kroki-containers-together>>を参照。
+====
+
+==== Krokiで画像を生成する
+
+<<use-docker-image-of-asciidoctor>>で環境を構築しているものとする。
+
+AsciiDoctorコンテナとKrokiコンテナの間で通信可能にするために、AsciiDoctorコンテナとKrokiコンテナを同じDockerブリッジネットワークに接続する必要がある。
+AsciiDoctorコンテナを<<create-bridge-network>>で作成したブリッジネットワークに接続するために、  `.devcontainer.json` に以下を追加する。
+
+[source, json]
+.devcontainer.json
+----
+{
+  "runArgs": [ "--network=asciidoctor" ]
+}
+----
+
+AsciiDoctor-Krokiで画像を生成するために、AsciiDocファイルのアトリビュートに以下を定義する。
+
+[source, asciidoc]
+----
+// KrokiサーバのURLを指定
+:kroki-server-url: http://kroki:8000 //<1>
+// Krokiサーバで生成した画像の埋め込みを許可する
+:allow-uri-read:
+----
+<1> コンテナ間の通信であるため、<<run-kroki-container>>でホスト側に公開するポート番号を変更していても、ここではKrokiコンテナ側のポート番号である8000を指定する。
+
+vscodeでプレビューにKrokiで生成した画像を埋め込むために、 `settings.json` に以下を追加する。
+
+[source, json]
+.settings.json
+----
+{
+  "asciidoc.use_kroki": true
+}
+----
+
+vscodeのプレビューでは、デフォルトでは別のサーバで生成した画像はセキュリティ上の理由により表示できない。
+セキュリティ設定を変更するため、 btn:[F1] -> "AsciiDoc: Change Preview Security Settings" -> "Allow insecure local content"を選択する。
+
+コマンドラインでHTMLファイルおよびPDFファイルに変換するには、以下のように使用するライブラリに `asciidoctor-kroki` を指定する。
+
+[source, bash]
+----
+asciidoctor -r asciidoctor-kroki index.adoc
+asciidoctor-pdf -r asciidoctor-kroki index.adoc
+----
 
 == ローカル環境に直接各種ソフトウェアをインストールする
 
@@ -329,3 +433,4 @@ skinparam {
 * [[[remote-containers-extension, 2]]] https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers
 * [[[developing-inside-container, 3]]] https://code.visualstudio.com/docs/remote/containers[Developing inside a Container using Visual Studio Code Remote Development]
 * [[[docker-asciidoctor, 4]]] https://hub.docker.com/r/asciidoctor/docker-asciidoctor/[asciidoctor/docker-asciidoctor - Docker Image | Docker Hub]
+* [[[run-multiple-kroki-containers-together, 5]]] link:https://docs.kroki.io/kroki/setup/use-docker-or-podman/#_run_multiple_kroki_containers_together[Run multiple Kroki containers together - Using Docker or Podman :: Kroki Documentation]

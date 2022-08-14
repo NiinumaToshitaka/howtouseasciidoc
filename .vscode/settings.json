@@ -1,7 +1,5 @@
 {
-    "asciidoc.asciidoctor_command": "asciidoctor -r asciidoctor-diagram",
-    "asciidoc.asciidoctorpdf_command": "asciidoctor-pdf -r asciidoctor-diagram",
-    "asciidoc.use_asciidoctor_js": false,
-    "asciidoc.use_asciidoctorpdf": true,
-    "asciidoc.useWorkspaceRoot": true
+    "asciidoc.use_asciidoctor_js": true,
+    "asciidoc.useWorkspaceRoot": true,
+    "asciidoc.use_kroki": true
 }

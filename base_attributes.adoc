@@ -132,3 +132,11 @@
 // :hardbreaks-option:
 // キーボードショートカットのレンダリングなどの機能を有効にする
 :experimental:
+// 図のレンダリングに使用するKrokiサーバのURLを指定する。
+// "kroki"という名前で作成したDockerコンテナにアクセスする。
+:kroki-server-url: http://kroki:8000
+// URIで指定されたコンテンツのインクルードを許可する
+// Krokiで生成した画像は変換後のhtmlファイルやpdfファイルに
+// URIで埋め込まれるが、デフォルトではURIで埋め込むことができないため、
+// 明示的に許可する。
+:allow-uri-read:
