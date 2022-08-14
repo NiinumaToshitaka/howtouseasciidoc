@@ -54,6 +54,9 @@ Server: Docker Engine - Community
  docker-init:
   Version:          0.19.0
   GitCommit:        de40ad0
+
+$ docker compose version
+Docker Compose version v2.6.0
 ----
 
 [[pull-docker-image]]
@@ -141,61 +144,88 @@ FROM asciidoctor/docker-asciidoctor:{docker-asciidoctor-latest}
 [[convert-diagram-by-kroki]]
 === 作図にKrokiを使用する
 
-[[create-bridge-network]]
-==== ブリッジネットワークを作成
+[[add-docker-compose-file]]
+==== Docker Composeファイルを作成
 
-AsciiDoctorコンテナとKrokiコンテナの間で通信する必要があるので、ブリッジネットワークを作成する。
-ここでは `asciidoctor` という名前で作成する。
+以下の内容のDocker Composeファイルをワークスペース直下に `.devcontainer/compose.yaml` として保存する。
+内容は<<run-multiple-kroki-containers-together>>を元に、不要なコンテナを削除し、AsciiDoctorコンテナを追加した。
 
-[source, console, linenums]
+[source, yaml]
+.compose.yaml
 ----
-$ docker network create asciidoctor
-4f41b56b14e5be913ce37ad96979ae22bfca47735029b383cf9893542350c5f1
+version: "3"
+services:
+  asciidoctor:
+    image: asciidoctor/docker-asciidoctor:1.28
+    depends_on:
+      - kroki
+    volumes:
+      # このDockerイメージからコンテナを作成して実行すると、
+      # 起動時のカレントディレクトリが"/documents"
+      - ../:/documents
+    # デフォルトではこのDockerイメージに
+    # フォアグラウンドで実行されるプロセスがないため、
+    # コンテナが自動的に終了してしまうのを防ぐ
+    command: /bin/sh -c "while sleep 1000; do :; done"
+  kroki:
+    image: yuzutech/kroki:0.17.2
+    depends_on:
+      - mermaid
+    environment:
+      - KROKI_MERMAID_HOST=mermaid
+    ports:
+      - "8000:8000"
+  mermaid:
+    image: yuzutech/kroki-mermaid:0.17.2
+    expose:
+      - "8002"
 ----
 
-[[run-kroki-container]]
-==== コンテナ実行
+`docker compose up --detach` で上記ファイルを読み込み、各コンテナを実行する。
 
-[source, bash, subs="attributes+"]
-----
-docker run \
-  --rm \#<1>
-  --name kroki \#<2>
-  --publish {kroki-publish-port}:8000 \#<3>
-  --network asciidoctor \#<4>
-  --detach \#<5>
-  yuzutech/kroki:0.17.2 #<6>
-----
-<1> 実行終了時にコンテナを削除する（コンテナを残しておく必要がないため）
-<2> コンテナ名を指定する（必須ではないが名前を固定したほうがわかりやすい）
-<3> ホスト側に公開するポート番号を割り当てる。{kroki-publish-port}番が既に使用されている場合は別のポート番号を割り当てる。たとえば `--publish 1234:8000` とすると、ホスト側からは http://localhost:1234 からアクセスできる。
-<4> <<create-bridge-network>>で作成したネットワークに接続する
-<5> バックグラウンドでコンテナを実行する
-<6> https://hub.docker.com/r/yuzutech/kroki[Kroki公式のイメージ配布ページ] から、最新のイメージのバージョンを確認して使用する
-
-上記コマンド実行後、ホスト側から http://localhost:{kroki-publish-port} にアクセスできることを確認する。
-
-[CAUTION]
+[NOTE]
 ====
-`yuzutech/kroki` イメージ単体だと、PlantUMLの図はレンダリングできるが、Mermaidなどいくつかの図はレンダリングできない。他のコンテナを立てる必要がある。
-
-他のコンテナを立てる手順は<<run-multiple-kroki-containers-together>>を参照。
+ネットには `docker compose` （ハイフンがつかない） ではなく `docker-compose` （ハイフンがつく）を使用している記事が多い。
+`docker-compose` は古いバージョンのDocker Composeで使用されていたものであるため、現在は `docker compose` を使用すること。<<compose-v2-docker-compose>>
 ====
 
-==== Krokiで画像を生成する
+[[add-devcontainer-json]]
+==== .devcontainer.jsonを作成
 
-<<use-docker-image-of-asciidoctor>>で環境を構築しているものとする。
-
-AsciiDoctorコンテナとKrokiコンテナの間で通信可能にするために、AsciiDoctorコンテナとKrokiコンテナを同じDockerブリッジネットワークに接続する必要がある。
-AsciiDoctorコンテナを<<create-bridge-network>>で作成したブリッジネットワークに接続するために、  `.devcontainer.json` に以下を追加する。
+以下の内容のjsonファイルを `.devcontainer/devcontainer.json` として保存する。
 
 [source, json]
 .devcontainer.json
 ----
 {
-  "runArgs": [ "--network=asciidoctor" ]
+  "name": "AsciiDoctor",
+  "dockerComposeFile": "./compose.yaml",//<1>
+  "service": "asciidoctor",//<2>
+  "customizations": {
+    "vscode": {
+      "extensions": [//<3>
+        "asciidoctor.asciidoctor-vscode",
+        "mhutchie.git-graph",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "workspaceFolder": "/documents"//<4>
 }
 ----
+<1> 読み込むDocker Composeファイルを指定
+<2> "dockerComposeFile"の"services"から、vscodeにアタッチするコンテナを指定
+<3> コンテナ内にインストールするvscode拡張機能IDを指定
+<4> "service"で指定したコンテナのディレクトリから、vscodeにアタッチするディレクトリを指定する
+
+==== Dockerコンテナ内でワークスペースを開く
+
+. kbd:[F1] -> "Remote-Containers: Open Folder in Container..."を選択
+. ワークスペースのフォルダを選択
+. <<add-docker-compose-file>>で作成したDocker Composeファイルを元にコンテナが実行される
+. ビルド完了後、ワークスペースが<<add-devcontainer-json>>で指定したコンテナ内で開かれる
+
+==== Krokiで画像を生成する
 
 AsciiDoctor-Krokiで画像を生成するために、AsciiDocファイルのアトリビュートに以下を定義する。
 
@@ -206,7 +236,7 @@ AsciiDoctor-Krokiで画像を生成するために、AsciiDocファイルのア�
 // Krokiサーバで生成した画像の埋め込みを許可する
 :allow-uri-read:
 ----
-<1> コンテナ間の通信であるため、<<run-kroki-container>>でホスト側に公開するポート番号を変更していても、ここではKrokiコンテナ側のポート番号である8000を指定する。
+<1> コンテナ間の通信であるため、<<add-docker-compose-file>>でホスト側に公開するポート番号を変更していても、ここではKrokiコンテナ側のポート番号である8000を指定する。
 
 vscodeでプレビューにKrokiで生成した画像を埋め込むために、 `settings.json` に以下を追加する。
 
@@ -228,6 +258,45 @@ vscodeのプレビューでは、デフォルトでは別のサーバで生成�
 asciidoctor -r asciidoctor-kroki index.adoc
 asciidoctor-pdf -r asciidoctor-kroki index.adoc
 ----
+
+ここまでの設定が完了していれば、下図をレンダリングすることができる。
+
+[mermaid, abcd-flowchart]
+.Mermaidによる作図例
+....
+sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>John: Hello John, how are you?
+    loop Healthcheck
+        John->>John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts <br/>prevail!
+    John-->>Alice: Great!
+    John->>Bob: How about you?
+    Bob-->>John: Jolly good!
+....
+
+[NOTE]
+====
+ここまで頑張って設定したものの、下図をMermaidでレンダリングすると、文字が見切れる。
+
+[source, asciidoc]
+----
+[mermaid,abcd-flowchart,svg]
+....
+graph TD;
+    A-->B;
+    A-->C;
+    B-->D;
+    C-->D;
+....
+----
+
+このせいか、asciidoctor-pdf実行時にエラーが発生して画像を埋め込むことができない。
+
+AsciiDoctorコンテナだけでもPlantUMLは使用できるので、KrokiコンテナでMermaidをレンダリングするのを止めて素直にPlantUMLを使用したほうがいいかもしれない。
+====
 
 == ローカル環境に直接各種ソフトウェアをインストールする
 
@@ -436,3 +505,4 @@ skinparam {
 * [[[developing-inside-container, 3]]] https://code.visualstudio.com/docs/remote/containers[Developing inside a Container using Visual Studio Code Remote Development]
 * [[[docker-asciidoctor, 4]]] https://hub.docker.com/r/asciidoctor/docker-asciidoctor/[asciidoctor/docker-asciidoctor - Docker Image | Docker Hub]
 * [[[run-multiple-kroki-containers-together, 5]]] link:https://docs.kroki.io/kroki/setup/use-docker-or-podman/#_run_multiple_kroki_containers_together[Run multiple Kroki containers together - Using Docker or Podman :: Kroki Documentation]
+* [[[compose-v2-docker-compose, 6]]] https://docs.docker.jp/compose/#compose-v2-docker-compose
