@@ -56,3 +56,4 @@ Thumbs.db
 # ビルドした成果物は管理しない
 *.html
 *.pdf
+images/

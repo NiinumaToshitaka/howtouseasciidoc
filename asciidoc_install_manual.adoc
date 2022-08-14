@@ -11,13 +11,25 @@
 :scripts: cjk
 // 画像を格納するルートディレクトリ。
 // このアトリビュートを設定した場合、たとえば"images:hoge.png[]"のように記載したとき、
-// "<このファイルが存在するディレクトリ>/.asciidoctor/hoge.png"が挿入される。
-:imagesdir: .asciidoctor
+// "<このファイルが存在するディレクトリ>/{imagesdir}/hoge.png"が挿入される。
+:imagesdir: images
 // asciidoctorが図の画像ファイルを出力するときの保存先ディレクトリ
-:imagesoutdir: .asciidoctor
-// ダイアグラム画像のキャッシュディレクトリ
-// 指定しない場合，ソースファイルのディレクトリに".asciidoctor"という名前のディレクトリが作成される
+// このアトリビュートは画像を出力する時に使用されるだけで、
+// htmlファイルなどを生成するときに画像の保存先として参照するのは
+// {imagesoutdir}ではなく{imagesdir}なので、
+// {imagesoutdir}と{imagesdir}の一致が必須。
+:imagesoutdir: {imagesdir}
+// ダイアグラム画像などの出力先ディレクトリ
+// {imagesoutdir} が設定されていない場合、
+// {outdir}/{imagesdir} にダイアグラム画像が出力される
+// 詳細は以下ページを参照
+// <https://docs.asciidoctor.org/diagram-extension/latest/#image-output-location>
 :outdir: .asciidoctor
+// ダイアグラム画像のキャッシュディレクトリ
+// デフォルトでは".asciidoctor/diagram"に出力される
+// 詳細は以下ページを参照
+// <https://docs.asciidoctor.org/diagram-extension/latest/#image-cache-location>
+:diagram-cachedir: {outdir}/diagram
 // PlantUML図の画像フォーマットを指定
 // ":<ダイアグラムタイプ>-<アトリビュート名>: 値"のフォーマットで，
 // ダイアグラムのアトリビュートをドキュメントレベルで指定できる。
