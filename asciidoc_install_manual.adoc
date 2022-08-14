@@ -9,6 +9,17 @@
 // "asciidoctor-pdf-cjk"アトリビュートを指定しているweb記事もあるが、
 // 現在はこのアトリビュートはメンテナンスが終了しており最新のasciidoctorでは使用できない。
 :scripts: cjk
+// 画像をデータURLとしてhtmlファイルに埋め込む。
+// これにより、htmlファイルを単独で配布することが可能になる。
+// AsciiDoctor PDFではデフォルトで有効になる。
+// （PDFは画像を埋め込む必要があるので当然だが）
+// 詳細は以下ページを参照
+// <https://docs.asciidoctor.org/asciidoctor/latest/html-backend/manage-images/#embed-images-with-the-data-uri-attribute>
+// <https://docs.asciidoctor.org/pdf-converter/latest/image-paths-and-formats/#asciidoctor-diagram-integration>
+// <https://developer.mozilla.org/ja/docs/Web/HTTP/Basics_of_HTTP/Data_URLs>
+// データURLを扱うのにアトリビュート名が"data-uri"なのは、
+// データURLが以前は"data URIs"と呼ばれていたためだろう。
+:data-uri:
 // 画像を格納するルートディレクトリ。
 // このアトリビュートを設定した場合、たとえば"images:hoge.png[]"のように記載したとき、
 // "<このファイルが存在するディレクトリ>/{imagesdir}/hoge.png"が挿入される。
