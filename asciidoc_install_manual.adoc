@@ -18,8 +18,18 @@
 // ダイアグラム画像のキャッシュディレクトリ
 // 指定しない場合，ソースファイルのディレクトリに".asciidoctor"という名前のディレクトリが作成される
 :outdir: .asciidoctor
+// PlantUML図の画像フォーマットを指定
+// ":<ダイアグラムタイプ>-<アトリビュート名>: 値"のフォーマットで，
+// ダイアグラムのアトリビュートをドキュメントレベルで指定できる。
+// 詳細は以下ページを参照。
+// <https://docs.asciidoctor.org/diagram-extension/latest/#diagram-attributes>
+:plantuml-format: svg
 // 章番号を振る
 :sectnums:
+// 章番号を振るレベルを指定(0 - 5)
+// デフォルト値は3
+// ここで指定した値より大きいレベルの章には章番号が振られない
+:sectnumlevels: 5
 // 目次を入れる
 :toc: left
 // 目次のタイトルを設定する。指定しない場合は"Table of Contents"になる。
@@ -28,6 +38,12 @@
 :icons: font
 // ソースコードのハイライトに使用するツールを指定
 :source-highlighter: rouge
+// ソースコードブロックに行番号を表示する
+:source-linenums-option:
+// ソースコードブロックやリテラルブロックの行の折り返しを無効にする
+// 詳細は以下ページを参照
+// <https://docs.asciidoctor.org/asciidoctor/latest/html-backend/verbatim-line-wrap/>
+:prewrap!:
 // ドキュメント仕様。AsciiDoctorによる拡張構文を使用する。
 :asciidoctor:
 // 言語
@@ -77,6 +93,13 @@
 :revdate: {commit-date}
 // last-updateのラベルを"最終更新"とする
 :last-update-label: 最終更新
+// 最終更新の日時を出力しない
+// コミット日時を出力するので，ファイルの更新日時を出力する必要がない。
+:reproducible:
+// 改行を保持する
+// 設定しない場合，AsciiDocファイル内での改行は
+// 変換時には無視され，前の行の末尾に結合される。
+:hardbreaks-option:
 
 これはまえがき
 
