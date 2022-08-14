@@ -1,7 +1,129 @@
 = 環境構築
 include::base_attributes.adoc[]
+// AsciiDoctorのDockerイメージの最新バージョン
+:docker-asciidoctor-latest: 1.28
 
-== rubyインストール
+AsciiDocの執筆環境を構築するには、以下の2種類の方法がある。
+
+* ローカル環境に直接各種ソフトウェアをインストールする
+* AsciiDoctorの公式から提供されているDockerイメージを使用する
+
+== Dockerイメージを使用する
+
+=== 環境
+
+既にvscodeとDockerがインストール済みであるものとする。
+執筆時の環境を以下に示す。
+
+[source, bash]
+----
+$ code --version
+1.70.0
+da76f93349a72022ca4670c1b84860304616aaa2
+x64
+
+$ docker version
+Client: Docker Engine - Community
+ Version:           20.10.17
+ API version:       1.41
+ Go version:        go1.17.11
+ Git commit:        100c701
+ Built:             Mon Jun  6 23:02:57 2022
+ OS/Arch:           linux/amd64
+ Context:           default
+ Experimental:      true
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          20.10.17
+  API version:      1.41 (minimum version 1.12)
+  Go version:       go1.17.11
+  Git commit:       a89b842
+  Built:            Mon Jun  6 23:01:03 2022
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.6.6
+  GitCommit:        10c12954828e7c7c9b6e0ea9b0c02b01407d3ae1
+ runc:
+  Version:          1.1.2
+  GitCommit:        v1.1.2-0-ga916309
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+----
+
+[[pull-docker-image]]
+=== Dockerイメージをpull
+
+https://hub.docker.com/r/asciidoctor/docker-asciidoctor/[asciidoctor/docker-asciidoctor - Docker Image | Docker Hub] で最新のイメージのバージョンを確認する。
+執筆時の最新バージョンは{docker-asciidoctor-latest}だった。
+
+最新バージョンを確認したら、以下のコマンドによりDockerイメージをpullする。
+`{docker-asciidoctor-latest}` の部分は上で確認したバージョンに置き換えること。
+
+[source, bash, subs="attributes+"]
+----
+docker pull asciidoctor/docker-asciidoctor:{docker-asciidoctor-latest}
+----
+
+なお、AsciiDoctorのDockerイメージさえあれば、以下のようにコマンドラインでAsciiDoctorを実行することができる。
+
+[source, bash, subs="attributes+"]
+----
+cd <変換するAsciiDocファイルがあるディレクトリ>
+docker run \
+  --rm \#<1>
+  -it \#<2>
+  --volume $(pwd):/documents/ \#<3>
+  asciidoctor/docker-asciidoctor:{docker-asciidoctor-latest} \#<4>
+  asciidoctor -r asciidoctor-diagram sample-with-diagram.adoc #<5>
+----
+<1> 実行後にコンテナを自動的に削除する（コンテナを残しておく必要がないため）
+<2> コンテナの標準入出力をターミナルの標準入出力に接続する
+<3> カレントディレクトリをコンテナの `/documents/` にマウントする。AsciiDoctorコマンドはコンテナの `/documents/` ディレクトリで実行されるため、このディレクトリにマウントする。
+<4> 上でpullしたDockerイメージを指定する。
+<5> AsciiDoctorを実行する。
+
+=== vscodeでAsciiDocファイルを編集
+
+vscodeの https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers[Remote - Containers] 拡張機能を使用して、コンテナ内に環境を構築する。
+この拡張機能の仕組みは https://code.visualstudio.com/docs/remote/containers[Developing inside a Container using Visual Studio Code Remote Development] を参照。
+
+==== 拡張機能をインストール
+
+拡張機能画面から"Remote - Containers"をインストールする。
+
+[[put-dockerfile]]
+==== Dockerfileを配置
+
+コンテナを作成するためのDockerfileを作成する。
+以下の内容のDockerfileをワークスペース直下に配置する。
+`{docker-asciidoctor-latest}` の部分は<<pull-docker-image>>で確認したバージョンに合わせる。
+
+[source, dockerfile, subs="attributes+"]
+.Dockerfile
+----
+FROM asciidoctor/docker-asciidoctor:{docker-asciidoctor-latest}
+----
+
+==== Dockerコンテナ内でワークスペースを開く
+
+. kbd:[F1] -> "Remote-Containers: Open Folder in Container..."を選択
+. ワークスペースのフォルダを選択
+. ワークスペースにvscodeの設定ファイル `.devcontainer/devcontainer.json` が追加される
+. <<put-dockerfile>>で作成したDockerfileを元にコンテナがビルドされる
+. ビルド完了後、ワークスペースがコンテナ内で開かれる
+
+==== 拡張機能を設定ファイルに追加
+
+ワークスペースで有効化したい拡張機能がある場合、 `.devcontainer/devcontainer.json` の"customizations -> vscode -> extensions"に拡張機能IDを記載することで、次回起動時に自動的に拡張機能がインストールされる。
+
+直接上記の設定ファイルを編集する代わりに、拡張機能画面で追加したい拡張機能を右クリックして"Add to devcontainer.json"を選択してもよい。
+
+== ローカル環境に直接各種ソフトウェアをインストールする
+
+=== rubyインストール
 
 asciidoctor（後述）はubuntuのパッケージ管理システムにも登録されているが、RubyGem (gem)パッケージとして配布されているものを使用するのが一般的なようなので、rubyをインストールする。
 
@@ -10,7 +132,7 @@ asciidoctor（後述）はubuntuのパッケージ管理システムにも登録
 
 ``sudo apt install ruby``
 
-== asciidoctorインストール
+=== asciidoctorインストール
 
 asciidocの処理系としてデファクトスタンダードであるasciidoctorを使用する。
 
@@ -20,7 +142,7 @@ asciidocの処理系としてデファクトスタンダードであるasciidoct
 * `asciidoctor-pdf`: PDFに変換するのに使う
 * `asciidoctor-diagram`: PlantUMLなどの図をレンダリングするために使うasciidoc拡張
 
-== ソースコードのハイライト設定
+=== ソースコードのハイライト設定
 
 ソースコードをハイライトするには、ハイライト用ツールをインストールした上で、アトリビュートを指定する必要がある。
 
@@ -30,7 +152,7 @@ asciidocの処理系としてデファクトスタンダードであるasciidoct
 
 . アトリビュートを設定: asciidocファイルに``:source-highlighter: rouge``を追加
 
-== 文字色の設定
+=== 文字色の設定
 
 asciidoctor-pdfのデフォルト設定でPDFに出力すると、文字色が反映されない。
 これはテーマファイルにおける``role``カテゴリーを定義することで対応する。
@@ -71,7 +193,7 @@ role:
 
 デフォルトのテーマファイルを作業ディレクトリにコピーして、いい感じになるように編集するのが手っ取り早いかもしれない。
 
-== 日本語フォントを導入
+=== 日本語フォントを導入
 
 https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88%E3%81%AE%E5%88%A9%E7%94%A8[AsciiDoc文書作成入門 [AFFRIT Portal\]]の"8. 日本語フォントの利用"を参照。
 ただし、themeファイルの拡張子は``.yml``である必要がある。yaml形式だからといって``.yaml``にすると、以下のようなエラーが発生する。
@@ -90,13 +212,13 @@ asciidoctor: ERROR: could not locate or load the built-in pdf theme `./theme.yam
 * https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
 * https://wohl-yz.net/archives/1683[Docker版 仕様書が書きたくなるAsciiDoc Markdown風にドキュメント作成 | 合同会社ヴォール]
 
-== vscodeインストール
+=== vscodeインストール
 
 Visual Studio Code(vscode)の拡張機能を使うと、asciidocテキストを編集したりプレビューしたりするのが簡単にできるので、ここではasciidocテキストのエディタとしてvscodeを使う。
 
 Ubuntu Softwareからvscodeをインストールすると日本語を入力できないので、link:https://code.visualstudio.com[Visual Studio Code - Code Editing. Redefined]からdebパッケージをダウンロードしてインストールする。
 
-== vscodeのasciidoc拡張機能をインストール
+=== vscodeのasciidoc拡張機能をインストール
 
 拡張機能タブで``asciidoctor.asciidoctor-vscode``を検索してインストールする。
 ファイルの拡張子を``.adoc``にして保存すると、asciidocテキストのハイライトが有効になる。
@@ -108,22 +230,22 @@ vscodeの設定画面を開き、以下のとおり設定する。
 * Asciidoc: Use_asciidoctorpdf: チェックを入れる。PCにインストールしたasciidoctor-pdf(Ruby版)を使う。
 * Asciidoc: Use Workspace Root: チェックを入れる。ワークスペースのrootパスをベースディレクトリとする。
 
-== PlantUMLによる作図環境構築
+=== PlantUMLによる作図環境構築
 
-=== javaインストール
+==== javaインストール
 
 ``sudo apt install default-jdk``
 
 ちなみに、javaソフトウェアの実行だけならJREでもいいが、あとからJDKをインストールするのが面倒なので、ここではJDKをインストールしている。
 
-=== GraphVizインストール
+==== GraphVizインストール
 
 `sudo apt install graphviz`
 
 ちなみに、一部の図はPlantUMLが生成するためにGraphVizを使用しない。
 GraphVizが必要になる図はlink:https://plantuml.com/ja/graphviz-dot[Test your GraphViz installation]を参照。
 
-=== 日本語の文字化け対策
+==== 日本語の文字化け対策
 
 デフォルトの設定ではsvg形式で図を保存するとPDF出力したときに日本語が文字化けする。
 これはPlantUMLの問題ではなく、asciidoctor-diagramが日本語を含むsvg画像を出力するときに日本語に対応したフォントを使用しないことが原因である。
@@ -154,7 +276,7 @@ asciidoctor-pdf実行時、以下のように上記ファイルをロードす�
 ** asciidocでは、URLの中に``_``で囲まれた部分があるとイタリック演算子として扱われてしまい、リンクが機能しなくなる。これを防ぐには、``\pass:[URL]``のように``pass``でURLを囲むことで記号をエスケープする。
 ** この記事で紹介されている、asciidocotor-pdf-cjk-kai_gen_gothicをインストールする方法は、link:https://github.com/chloerei/asciidoctor-pdf-cjk-kai_gen_gothic[現在は非推奨]であるうえ、実際に試したら最新のasciidoctor-pdfでは使えなかった。
 
-=== 日本語の文字の間隔が詰まる現象の対策
+==== 日本語の文字の間隔が詰まる現象の対策
 
 ubuntu on WSLの環境だと，日本語の文字の間隔が詰まって見栄えが悪い。
 これはwindowsとubuntu on WSLの環境でインストールされているフォントが異なるのが原因である。
