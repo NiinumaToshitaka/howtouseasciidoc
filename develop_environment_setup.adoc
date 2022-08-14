@@ -1,4 +1,7 @@
-=== rubyインストール
+= 環境構築
+include::base_attributes.adoc[]
+
+== rubyインストール
 
 asciidoctor（後述）はubuntuのパッケージ管理システムにも登録されているが、RubyGem (gem)パッケージとして配布されているものを使用するのが一般的なようなので、rubyをインストールする。
 
@@ -7,7 +10,7 @@ asciidoctor（後述）はubuntuのパッケージ管理システムにも登録
 
 ``sudo apt install ruby``
 
-=== asciidoctorインストール
+== asciidoctorインストール
 
 asciidocの処理系としてデファクトスタンダードであるasciidoctorを使用する。
 
@@ -17,7 +20,7 @@ asciidocの処理系としてデファクトスタンダードであるasciidoct
 * `asciidoctor-pdf`: PDFに変換するのに使う
 * `asciidoctor-diagram`: PlantUMLなどの図をレンダリングするために使うasciidoc拡張
 
-=== ソースコードのハイライト設定
+== ソースコードのハイライト設定
 
 ソースコードをハイライトするには、ハイライト用ツールをインストールした上で、アトリビュートを指定する必要がある。
 
@@ -27,7 +30,7 @@ asciidocの処理系としてデファクトスタンダードであるasciidoct
 
 . アトリビュートを設定: asciidocファイルに``:source-highlighter: rouge``を追加
 
-=== 文字色の設定
+== 文字色の設定
 
 asciidoctor-pdfのデフォルト設定でPDFに出力すると、文字色が反映されない。
 これはテーマファイルにおける``role``カテゴリーを定義することで対応する。
@@ -68,7 +71,7 @@ role:
 
 デフォルトのテーマファイルを作業ディレクトリにコピーして、いい感じになるように編集するのが手っ取り早いかもしれない。
 
-=== 日本語フォントを導入
+== 日本語フォントを導入
 
 https://itcweb.cc.affrc.go.jp/affrit/documents/guide/asciidoc/start#%E6%97%A5%E6%9C%AC%E8%AA%9E%E3%83%95%E3%82%A9%E3%83%B3%E3%83%88%E3%81%AE%E5%88%A9%E7%94%A8[AsciiDoc文書作成入門 [AFFRIT Portal\]]の"8. 日本語フォントの利用"を参照。
 ただし、themeファイルの拡張子は``.yml``である必要がある。yaml形式だからといって``.yaml``にすると、以下のようなエラーが発生する。
@@ -87,13 +90,13 @@ asciidoctor: ERROR: could not locate or load the built-in pdf theme `./theme.yam
 * https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
 * https://wohl-yz.net/archives/1683[Docker版 仕様書が書きたくなるAsciiDoc Markdown風にドキュメント作成 | 合同会社ヴォール]
 
-=== vscodeインストール
+== vscodeインストール
 
 Visual Studio Code(vscode)の拡張機能を使うと、asciidocテキストを編集したりプレビューしたりするのが簡単にできるので、ここではasciidocテキストのエディタとしてvscodeを使う。
 
 Ubuntu Softwareからvscodeをインストールすると日本語を入力できないので、link:https://code.visualstudio.com[Visual Studio Code - Code Editing. Redefined]からdebパッケージをダウンロードしてインストールする。
 
-=== vscodeのasciidoc拡張機能をインストール
+== vscodeのasciidoc拡張機能をインストール
 
 拡張機能タブで``asciidoctor.asciidoctor-vscode``を検索してインストールする。
 ファイルの拡張子を``.adoc``にして保存すると、asciidocテキストのハイライトが有効になる。
@@ -105,22 +108,22 @@ vscodeの設定画面を開き、以下のとおり設定する。
 * Asciidoc: Use_asciidoctorpdf: チェックを入れる。PCにインストールしたasciidoctor-pdf(Ruby版)を使う。
 * Asciidoc: Use Workspace Root: チェックを入れる。ワークスペースのrootパスをベースディレクトリとする。
 
-=== PlantUMLによる作図環境構築
+== PlantUMLによる作図環境構築
 
-==== javaインストール
+=== javaインストール
 
 ``sudo apt install default-jdk``
 
 ちなみに、javaソフトウェアの実行だけならJREでもいいが、あとからJDKをインストールするのが面倒なので、ここではJDKをインストールしている。
 
-==== GraphVizインストール
+=== GraphVizインストール
 
 `sudo apt install graphviz`
 
 ちなみに、一部の図はPlantUMLが生成するためにGraphVizを使用しない。
 GraphVizが必要になる図はlink:https://plantuml.com/ja/graphviz-dot[Test your GraphViz installation]を参照。
 
-==== 日本語の文字化け対策
+=== 日本語の文字化け対策
 
 デフォルトの設定ではsvg形式で図を保存するとPDF出力したときに日本語が文字化けする。
 これはPlantUMLの問題ではなく、asciidoctor-diagramが日本語を含むsvg画像を出力するときに日本語に対応したフォントを使用しないことが原因である。
@@ -151,7 +154,7 @@ asciidoctor-pdf実行時、以下のように上記ファイルをロードす�
 ** asciidocでは、URLの中に``_``で囲まれた部分があるとイタリック演算子として扱われてしまい、リンクが機能しなくなる。これを防ぐには、``\pass:[URL]``のように``pass``でURLを囲むことで記号をエスケープする。
 ** この記事で紹介されている、asciidocotor-pdf-cjk-kai_gen_gothicをインストールする方法は、link:https://github.com/chloerei/asciidoctor-pdf-cjk-kai_gen_gothic[現在は非推奨]であるうえ、実際に試したら最新のasciidoctor-pdfでは使えなかった。
 
-==== 日本語の文字の間隔が詰まる現象の対策
+=== 日本語の文字の間隔が詰まる現象の対策
 
 ubuntu on WSLの環境だと，日本語の文字の間隔が詰まって見栄えが悪い。
 これはwindowsとubuntu on WSLの環境でインストールされているフォントが異なるのが原因である。

@@ -18,9 +18,7 @@ OS:: Ubuntu 20.04 LTS
 * https://waku-take-a.github.io/%25E3%2582%25B9%25E3%2582%25BF%25E3%2582%25A4%25E3%2583%25AB%25E3%2583%2595%25E3%2582%25A1%25E3%2582%25A4%25E3%2583%25AB%25E3%2581%25AB%25E3%2581%25A4%25E3%2581%2584%25E3%2581%25A6.html[スタイルファイルについて: WAKU-TAKE-A  PROGRAM]
 * https://ryuta46.com/267[AsciiDoc を PDF 化する時の日本語フォントを指定する]
 
-== 環境構築
-
-include::develop_environment_setup.adoc[]
+include::develop_environment_setup.adoc[leveloffset=+1]
 
 == メモ
 
